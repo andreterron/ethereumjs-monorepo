@@ -160,12 +160,12 @@ export default class EEI {
   async getExternalBalance(address: Address): Promise<bigint> {
     // shortcut if current account
     if (address.equals(this._env.address)) {
-      return this._env.contract.balance
+      return bnToBigInt(this._env.contract.balance)
     }
 
     // otherwise load account then return balance
     const account = await this._state.getAccount(address)
-    return account.balance
+    return bnToBigInt(account.balance)
   }
 
   /**
@@ -346,7 +346,7 @@ export default class EEI {
       // Sanity check
       throw new Error('Block has no Base Fee')
     }
-    return baseFee
+    return bnToBigInt(baseFee)
   }
 
   /**

@@ -182,7 +182,7 @@ export default async function runBlock(this: VM, opts: RunBlockOpts): Promise<Ru
   // header values against the current block.
   if (generateFields) {
     const bloom = result.bloom.bitvector
-    const gasUsed = result.gasUsed
+    const gasUsed = bigIntToBN(result.gasUsed)
     const receiptTrie = result.receiptRoot
     const transactionsTrie = await _genTxTrie(block)
     const generatedFields = { stateRoot, bloom, gasUsed, receiptTrie, transactionsTrie }
@@ -383,7 +383,11 @@ async function assignBlockRewards(this: VM, block: Block): Promise<void> {
   const ommers = block.uncleHeaders
   // Reward ommers
   for (const ommer of ommers) {
-    const reward = calculateOmmerReward(ommer.number, block.header.number, minerReward)
+    const reward = calculateOmmerReward(
+      bnToBigInt(ommer.number),
+      bnToBigInt(block.header.number),
+      minerReward
+    )
     const account = await rewardAccount(state, ommer.coinbase, reward)
     if (this.DEBUG) {
       debug(`Add uncle reward ${reward} to account ${ommer.coinbase} (-> ${account.balance})`)

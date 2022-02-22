@@ -782,7 +782,7 @@ export class Eth {
       const { gasUsed, createdAddress } = runBlockResult.results[txIndex]
       return jsonRpcReceipt(
         receipt,
-        gasUsed,
+        new BN(gasUsed.toString(10)),
         effectiveGasPrice,
         block,
         tx,
