@@ -8,7 +8,6 @@ import {
   KECCAK256_RLP_ARRAY,
   KECCAK256_RLP_S,
   KECCAK256_RLP,
-  TWO_POW256_BIGINT,
 } from '../src'
 
 tape('constants', function (t) {
@@ -29,7 +28,7 @@ tape('constants', function (t) {
     )
 
     st.equal(
-      TWO_POW256_BIGINT.toString(16),
+      TWO_POW256.toString(16),
       '10000000000000000000000000000000000000000000000000000000000000000'
     )
 

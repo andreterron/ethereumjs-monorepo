@@ -485,7 +485,7 @@ tape('runTx() -> API return values', async (t) => {
 
       t.equal(
         res.gasUsed,
-        bnToBigInt(tx.getBaseFee()),
+        tx.getBaseFee(),
         `runTx result -> gasUsed -> tx.getBaseFee() (${txType.name})`
       )
       if (tx instanceof FeeMarketEIP1559Transaction) {

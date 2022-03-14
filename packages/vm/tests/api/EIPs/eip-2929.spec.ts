@@ -51,7 +51,7 @@ tape('EIP 2929: gas cost tests', (t) => {
     await vm.stateManager.putContractCode(address, Buffer.from(test.code, 'hex'))
 
     const unsignedTx = Transaction.fromTxData({
-      gasLimit: bigIntToBN(initialGas), // ensure we pass a lot of gas, so we do not run out of gas
+      gasLimit: initialGas, // ensure we pass a lot of gas, so we do not run out of gas
       to: address, // call to the contract address,
     })
 

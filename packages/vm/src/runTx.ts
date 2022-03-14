@@ -362,7 +362,7 @@ async function _runTx(this: VM, opts: RunTxOpts): Promise<RunTxResult> {
     gasPrice = inclusionFeePerGas + baseFee
   } else {
     // Have to cast as legacy tx since EIP1559 tx does not have gas price
-    gasPrice = bnToBigInt((<Transaction>tx).gasPrice)
+    gasPrice = (<Transaction>tx).gasPrice
     if (this._common.isActivatedEIP(1559)) {
       const baseFee = block.header.baseFeePerGas!
       inclusionFeePerGas = (<Transaction>tx).gasPrice - baseFee
