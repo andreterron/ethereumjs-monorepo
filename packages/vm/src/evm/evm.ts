@@ -14,7 +14,6 @@ import { Block } from '@ethereumjs/block'
 import { Hardfork } from '@ethereumjs/common'
 
 import { ERROR, VmError } from '../exceptions'
-import { DefaultStateManager, StateManager } from '../state/index'
 import { getPrecompile, PrecompileFunc } from './precompiles'
 import TxContext from './txContext'
 import Message from './message'
@@ -29,6 +28,9 @@ import { getOpcodesForHF, OpcodeList, OpHandler } from './opcodes'
 import { AsyncDynamicGasHandler, SyncDynamicGasHandler } from './opcodes/gas'
 import Blockchain from '@ethereumjs/blockchain'
 import { SecureTrie as Trie } from 'merkle-patricia-tree'
+import { TransientStorage } from '../state'
+import { VmState } from '../vmState'
+import { DefaultStateManager, StateManager } from '@ethereumjs/statemanager'
 
 const debug = createDebugLogger('vm:evm')
 const debugGas = createDebugLogger('vm:evm:gas')
@@ -354,6 +356,7 @@ export default class EVM extends AsyncEventEmitter {
     super()
 
     this._refund = BigInt(0)
+    this._transientStorage = new TransientStorage()
 
     if (opts.common) {
       this._common = opts.common
@@ -382,7 +385,7 @@ export default class EVM extends AsyncEventEmitter {
         common: this._common,
       })
     }
-    this._blockchain = opts.blockchain ?? new Blockchain({ common: this._common })
+    this._blockchain = opts.blockchain ?? new (Blockchain as any)({ common: this._common })
 
     this._allowUnlimitedContractSize = opts.allowUnlimitedContractSize ?? false
     this._customOpcodes = opts.customOpcodes
@@ -486,7 +489,7 @@ export default class EVM extends AsyncEventEmitter {
       result = await this._executeCreate(message)
     }
     if (this.DEBUG) {
-      const { gasUsed, exceptionError, returnValue, gasRefund } = result.execResult
+      const { gasUsed, exceptionError, returnValue } = result.execResult
       debug(
         `Received message execResult: [ gasUsed=${gasUsed} exceptionError=${
           exceptionError ? `'${exceptionError.error}'` : 'none'

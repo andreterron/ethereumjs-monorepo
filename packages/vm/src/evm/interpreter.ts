@@ -61,7 +61,7 @@ export interface InterpreterStep {
  * Parses and executes EVM bytecode.
  */
 export default class Interpreter {
-  _state: StateManager
+  _state: VmState
   _runState: RunState
   _eei: EEI
   _common: Common
@@ -87,9 +87,9 @@ export default class Interpreter {
       returnStack: new Stack(1023), // 1023 return stack height limit per EIP 2315 spec
       code: Buffer.alloc(0),
       validJumps: Uint8Array.from([]),
-      vmState: this._state,
       eei: this._eei,
       shouldDoJumpAnalysis: true,
+      vmState: this._state,
     }
 
     // Safeguard if "process" is not available (browser)

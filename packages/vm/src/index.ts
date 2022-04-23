@@ -10,6 +10,7 @@ import { precompiles } from './evm/precompiles'
 import runBlockchain from './runBlockchain'
 const AsyncEventEmitter = require('async-eventemitter')
 import { promisify } from 'util'
+import { VmState } from './vmState'
 
 /**
  * Options for instantiating a {@link VM}.
@@ -234,11 +235,11 @@ export default class VM extends AsyncEventEmitter {
     }
     this.vmState = new VmState({ common: this._common, stateManager: this.stateManager })
 
-    this.blockchain = opts.blockchain ?? new Blockchain({ common: this._common })
+    this.blockchain = opts.blockchain ?? new (Blockchain as any)({ common: this._common })
 
     this.evm = new EVM({
       common: this._common,
-      stateManager: this.stateManager,
+      stateManager: this.vmState._stateManager,
       blockchain: this.blockchain,
     })
 
