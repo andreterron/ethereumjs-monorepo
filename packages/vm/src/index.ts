@@ -239,7 +239,7 @@ export default class VM extends AsyncEventEmitter {
 
     this.evm = new EVM({
       common: this._common,
-      stateManager: this.vmState._stateManager,
+      vmState: this.vmState,
       blockchain: this.blockchain,
     })
 

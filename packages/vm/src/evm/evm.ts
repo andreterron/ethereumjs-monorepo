@@ -30,7 +30,7 @@ import Blockchain from '@ethereumjs/blockchain'
 import { SecureTrie as Trie } from 'merkle-patricia-tree'
 import { TransientStorage } from '../state'
 import { VmState } from '../vmState'
-import { DefaultStateManager, StateManager } from '@ethereumjs/statemanager'
+import { DefaultStateManager } from '@ethereumjs/statemanager'
 
 const debug = createDebugLogger('vm:evm')
 const debugGas = createDebugLogger('vm:evm:gas')
@@ -76,9 +76,9 @@ export interface EVMOpts {
    */
   common?: Common
   /**
-   * A {@link StateManager} instance to use as the state store
+   * A {@link VmState} instance to use as the state store
    */
-  stateManager?: StateManager
+  vmState?: VmState
 
   /**
    * A {@link Blockchain} object for storing/retrieving blocks
@@ -294,7 +294,7 @@ export function VmErrorResult(error: VmError, gasUsed: bigint): ExecResult {
  * @ignore
  */
 export default class EVM extends AsyncEventEmitter {
-  _state: StateManager
+  _state: VmState
   _tx?: TxContext
   _block?: Block
   /**
@@ -376,14 +376,15 @@ export default class EVM extends AsyncEventEmitter {
       }
     }
 
-    if (opts.stateManager) {
-      this._state = opts.stateManager
+    if (opts.vmState) {
+      this._state = opts.vmState
     } else {
       const trie = new Trie()
-      this._state = new DefaultStateManager({
+      const stateManager = new DefaultStateManager({
         trie,
         common: this._common,
       })
+      this._state = new VmState({ common: this._common, stateManager })
     }
     this._blockchain = opts.blockchain ?? new (Blockchain as any)({ common: this._common })
 
