@@ -505,12 +505,8 @@ export default class EVM extends AsyncEventEmitter {
       result.execResult.selfdestruct = {}
     }
     result.gasRefund = this._refund
-
     if (err) {
-      if (
-        this._vm._common.gteHardfork(Hardfork.Homestead) ||
-        err.error != ERROR.CODESTORE_OUT_OF_GAS
-      ) {
+      if (this._common.gteHardfork(Hardfork.Homestead) || err.error != ERROR.CODESTORE_OUT_OF_GAS) {
         result.execResult.logs = []
         await this._state.revert()
         if (this.DEBUG) {
@@ -530,7 +526,6 @@ export default class EVM extends AsyncEventEmitter {
         debug(`message checkpoint committed`)
       }
     }
-
     await this._emit('afterMessage', result)
 
     return result
@@ -656,7 +651,7 @@ export default class EVM extends AsyncEventEmitter {
 
     toAccount = await this._state.getAccount(message.to)
     // EIP-161 on account creation and CREATE execution
-    if (this._vm._common.gteHardfork(Hardfork.SpuriousDragon)) {
+    if (this._common.gteHardfork(Hardfork.SpuriousDragon)) {
       toAccount.nonce += BigInt(1)
     }
 
@@ -713,8 +708,8 @@ export default class EVM extends AsyncEventEmitter {
     let allowedCodeSize = true
     if (
       !result.exceptionError &&
-      this._vm._common.gteHardfork(Hardfork.SpuriousDragon) &&
-      result.returnValue.length > this._vm._common.param('vm', 'maxCodeSize')
+      this._common.gteHardfork(Hardfork.SpuriousDragon) &&
+      result.returnValue.length > this._common.param('vm', 'maxCodeSize')
     ) {
       allowedCodeSize = false
     }
@@ -785,7 +780,7 @@ export default class EVM extends AsyncEventEmitter {
       }
     } else if (CodestoreOOG) {
       // This only happens at Frontier. But, let's do a sanity check;
-      if (!this._vm._common.gteHardfork(Hardfork.Homestead)) {
+      if (!this._common.gteHardfork(Hardfork.Homestead)) {
         // Pre-Homestead behavior; put an empty contract.
         // This contract would be considered "DEAD" in later hard forks.
         // It is thus an unecessary default item, which we have to save to dik
@@ -826,7 +821,7 @@ export default class EVM extends AsyncEventEmitter {
       env,
       this._state,
       this,
-      this._vm._common,
+      this._common,
       message.gasLimit,
       this._transientStorage
     )
